@@ -49,7 +49,7 @@ async function MenuSheet() {
           <div>
             <div className="font-bold">{full_name}</div>
             <div>
-              <Link href={"#"} className="text-green-500 texr-xs">
+              <Link href={"#"} className="text-green-500 text-xs">
                 アカウントを管理する
               </Link>
             </div>
@@ -61,7 +61,7 @@ async function MenuSheet() {
           <li>
             <Link href={"orders"} className="flex items-center gap-4">
               <Bookmark fill="bg-primary" />
-              <span className="font-bold">ご注文内容</span>
+              <span className="font-bold">しおり作成</span>
             </Link>
           </li>
           <li>
