@@ -1,5 +1,6 @@
 import Link from "next/link";
 import MenuSheet from "./menu-sheet";
+import PlaceSearchBar from "./ui/place-search-bar";
 
 const Header = () => {
   return (
@@ -10,7 +11,9 @@ const Header = () => {
           <Link href={"/"}>TABEful</Link>
         </div>
         <div>住所を選択</div>
-        <div className="flex-1 bg-yellow-200">検索バー</div>
+        <div className="flex-1">
+          <PlaceSearchBar />
+        </div>
         <div>アルバム</div>
       </div>
     </header>
