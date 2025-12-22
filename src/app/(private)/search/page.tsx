@@ -3,6 +3,7 @@ import Categories from "@/components/ui/categories";
 import {
   fetchCategoryRestaurants,
   fetchCRestaurantsByKeyword,
+  fetchLocation,
 } from "@/lib/restaurants/api";
 import { redirect } from "next/navigation";
 import React from "react";
@@ -15,9 +16,11 @@ export default async function SearchPage({
   const { category, restaurant } = await searchParams;
   console.log("restaurant", restaurant);
 
+  const { lat, lng } = await fetchLocation();
+
   if (category) {
     const { data: categoryRestaurants, error: fetchError } =
-      await fetchCategoryRestaurants(category);
+      await fetchCategoryRestaurants(category, lat, lng);
     return (
       <>
         <div className="mb-4">
@@ -37,7 +40,7 @@ export default async function SearchPage({
     );
   } else if (restaurant) {
     const { data: restaurants, error: fetchError } =
-      await fetchCRestaurantsByKeyword(restaurant);
+      await fetchCRestaurantsByKeyword(restaurant, lat, lng);
 
     return (
       <>

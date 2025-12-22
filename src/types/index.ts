@@ -35,6 +35,9 @@ export interface PlaceAutocompleteResult {
             mainText?:{
                 text: string
             };
+            secondaryText?:{
+                text?: string,
+            }
         };
     };
     queryPrediction?:{
@@ -44,8 +47,35 @@ export interface PlaceAutocompleteResult {
     }
 };
 
+export interface GooglePlacesDetailsApiResponse {
+    location?: { latitude?: number, longitude?: number }
+}
+
+export interface placeDetailsAll {
+        location?:{ latitude?: number, longitude?: number }
+    }
+
 export interface RestaurantSuggestion {
         type: string,
         placeId?: string,
         placeName: string,
     }
+
+export interface AddressSuggestion {
+        placeId: string,
+        placeName: string,
+        address_text: string
+    }
+
+export interface Address {
+    id: number,
+    name: string,
+    address_text: string,
+    latitude: number,
+    longitude: number
+}
+
+export interface AddressResponse {
+    addressList: Address[],
+    selectedAddress: Address;
+}

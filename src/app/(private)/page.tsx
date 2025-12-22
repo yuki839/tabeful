@@ -3,13 +3,19 @@ import RestaurantCard from "@/components/restaurant-card";
 import RestaurantList from "@/components/restaurant-list";
 import Section from "@/components/section";
 import Categories from "@/components/ui/categories";
-import { fetchRamenRestaurants, fetchRestaurants } from "@/lib/restaurants/api";
+import {
+  fetchLocation,
+  fetchRamenRestaurants,
+  fetchRestaurants,
+} from "@/lib/restaurants/api";
 
 export default async function Home() {
+  const { lat, lng } = await fetchLocation();
+
   const { data: nearbyRamenRestaurants, error: nearbyRamenRestaurantsError } =
-    await fetchRamenRestaurants();
+    await fetchRamenRestaurants(lat, lng);
   const { data: nearbyRestaurants, error: nearbyRestaurantsError } =
-    await fetchRestaurants();
+    await fetchRestaurants(lat, lng);
 
   return (
     <>
