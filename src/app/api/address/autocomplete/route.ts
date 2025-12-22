@@ -1,4 +1,4 @@
-import { GooglePlacesAutocompleteApiResponse, RestaurantSuggestion } from "@/types";
+import { AddressSuggestion, GooglePlacesAutocompleteApiResponse, RestaurantSuggestion } from "@/types";
 import { error } from "console";
 import { NextRequest, NextResponse } from "next/server"
 
@@ -6,10 +6,6 @@ export async function GET(request: NextRequest) {
       const searchParams = request.nextUrl.searchParams
   const input = searchParams.get('input');
   const sessionToken = searchParams.get('sessionToken');
-  const lat = searchParams.get('lat');
-  const lng = searchParams.get('lng');
-  console.log("input",input);
-  console.log("sessionToken",sessionToken);
 
   if(!input) {
     NextResponse.json({ error: "文字を入力してください"},{ status: 400 });
@@ -31,15 +27,15 @@ export async function GET(request: NextRequest) {
     };
     
     const requestBody = {
-        includeQueryPredictions: true,
+        // includeQueryPredictions: true,
         input: input,
         sessionToken: sessionToken,
-        includedPrimaryTypes: ["restaurant"],
+        //includedPrimaryTypes: ["restaurant"],
         locationBias: {
             circle: {
             center: {
-                latitude: lat,
-                longitude: lng,
+                latitude: 35.6642955,
+                longitude: 139.6684159,
             },
             radius: 1000.0
         }
@@ -71,24 +67,24 @@ export async function GET(request: NextRequest) {
     const suggestions = data.suggestions ?? [];
 
     const results = suggestions.map((suggestion) => {
-        if (suggestion.placePrediction &&
-             suggestion.placePrediction.placeId &&
-              suggestion.placePrediction.structuredFormat?.mainText?.text) {
-            return {
-                type: "placePrediction",
-                placeId: suggestion.placePrediction.placeId,
-                placeName: suggestion.placePrediction.structuredFormat?.mainText?.text, 
-            }
-        } else if (suggestion.queryPrediction &&
-             suggestion.queryPrediction.text?.text) {
-            return {
-                type: "queryPrediction",
-                placeName: suggestion.queryPrediction.text?.text
-            }
+        return {
+            placeId: suggestion.placePrediction?.placeId,
+            placeName: suggestion.placePrediction?.structuredFormat?.mainText?.text,
+            address_text: suggestion.placePrediction?.structuredFormat?.secondaryText?.text
         }
+    }).filter((suggestion): suggestion is AddressSuggestion => 
+        !!suggestion.placeId && 
+        !!suggestion.placeName && 
+        !!suggestion.address_text
+    );
 
-    }).filter((suggestion): suggestion is RestaurantSuggestion => suggestion !== undefined);
+    console.log("address_suggestion", results);
 
+    //{
+        //placeId: "djgsai",
+        //placeName: "渋谷駅",
+        //address_text: "日本 東京 渋谷区"
+    //}
 
     
     return NextResponse.json(results);
