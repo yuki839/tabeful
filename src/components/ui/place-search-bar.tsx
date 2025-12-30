@@ -132,15 +132,16 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
       value={selectedValue}
       onValueChange={handleValueChange}
       onKeyDown={handleKeyDown}
-      className="overflow-visible bg-muted"
+      className="overflow-visible bg-white border border-[#E0E0E0] rounded-full px-4 py-1.5 focus-within:border-[#2D2A26] focus-within:ring-1 focus-within:ring-[#2D2A26] shadow-sm"
       shouldFilter={false}
     >
       <CommandInput
         value={inputText}
-        placeholder="Type a command or search..."
+        placeholder="Search memories..."
         onValueChange={setInputText}
         onBlur={handleBlur}
         onFocus={handleFocus}
+        className="text-sm font-sans placeholder-[#B0AAA0]"
       />
       {open && (
         <div
@@ -150,14 +151,14 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
             lastInteractionRef.current = "pointer";
           }}
         >
-          <CommandList className="absolute bg-background w-full shadow-md rounded-lg">
+          <CommandList className="absolute mt-2 bg-white w-full border border-[#E5E5E5] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.18)] rounded-[4px]">
             <CommandEmpty>
-              <div className="flex items-center justify-center">
+              <div className="flex items-center justify-center text-sm text-[#8C8474] font-sans">
                 {isLoading ? (
-                  <LoaderCircle className=" animate-spin " />
+                  <LoaderCircle className="animate-spin" />
                 ) : errorMessage ? (
-                  <div>
-                    <AlertCircle className="flex items-center text-destructive gap-2" />
+                  <div className="flex items-center gap-2 text-destructive">
+                    <AlertCircle />
                     {errorMessage}
                   </div>
                 ) : (
@@ -167,18 +168,18 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
             </CommandEmpty>
             {suggestions.map((suggestion, index) => (
               <CommandItem
-                className="p-5"
+                className="px-4 py-3 text-sm text-[#2D2A26] font-sans data-[selected=true]:bg-[#F5F5F5]"
                 value={suggestion.placeName}
                 key={suggestion.placeId ?? index}
                 onSelect={() => handleSelectSuggestion(suggestion)}
                 onMouseDown={() => (clickedOnItem.current = true)}
               >
                 {suggestion.type === "queryPrediction" ? (
-                  <Search />
+                  <Search className="text-[#B0AAA0]" />
                 ) : (
-                  <MapPin />
+                  <MapPin className="text-[#B0AAA0]" />
                 )}
-                <p>{suggestion.placeName}</p>
+                <p className="truncate">{suggestion.placeName}</p>
               </CommandItem>
             ))}
           </CommandList>

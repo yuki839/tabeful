@@ -30,7 +30,7 @@ export default function CarouselContainer({
             //className="basis-1/2"
             style={{ flexBasis: `${100 / slideToShow}%` }}
           >
-            <div className="p-1">
+            <div className="p-2">
               <div>{child}</div>
             </div>
           </CarouselItem>

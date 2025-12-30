@@ -11,23 +11,30 @@ interface CategoryProps {
 
 export default function Category({ category, onClick, select }: CategoryProps) {
   return (
-    <div onClick={() => onClick(category.type)} className="cursor-pointer">
+    <div
+      onClick={() => onClick(category.type)}
+      className="cursor-pointer group"
+    >
       <div
         className={cn(
-          "relative aspect-square overflow-hidden rounded-full",
-          select && "bg-green-200"
+          "flex items-center gap-3 px-5 py-3 rounded-full border transition-all duration-300",
+          select
+            ? "bg-[#2D2A26] text-white border-[#2D2A26] shadow-md"
+            : "bg-white text-[#5C5448] border-[#E0E0E0] hover:border-[#2D2A26] hover:shadow-sm"
         )}
       >
-        <Image
-          className="object-cover scale-75"
-          src={category.imageUrl}
-          fill
-          alt={category.categoryName}
-          sizes="(max-width: 1280px) 10vw, 97px"
-        />
-      </div>
-      <div className="mt-2 text-center ">
-        <p className="text-xs truncate">{category.categoryName}</p>
+        <div className="relative w-8 h-8 rounded-full bg-[#F5F5F5] overflow-hidden">
+          <Image
+            className="object-cover scale-75 transition-transform duration-300 group-hover:scale-90"
+            src={category.imageUrl}
+            fill
+            alt={category.categoryName}
+            sizes="(max-width: 1280px) 10vw, 97px"
+          />
+        </div>
+        <p className="text-[11px] font-bold tracking-widest uppercase truncate">
+          {category.categoryName}
+        </p>
       </div>
     </div>
   );

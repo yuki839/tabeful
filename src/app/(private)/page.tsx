@@ -18,43 +18,56 @@ export default async function Home() {
     await fetchRestaurants(lat, lng);
 
   return (
-    <>
-      <Categories />
+    <div className="min-h-screen bg-[#FAF9F6] text-[#2D2A26] font-serif selection:bg-[#D6C0B3] selection:text-white">
+      <main className="w-full max-w-[1400px] mx-auto px-4 md:px-8 pt-24 pb-16 space-y-16">
+        <section className="pb-4 border-b border-[#E5E5E5]">
+          <Categories />
+        </section>
 
-      {!nearbyRestaurants ? (
-        <p>{nearbyRestaurantsError}</p>
-      ) : nearbyRestaurants.length > 0 ? (
-        <Section
-          title="近くのレストラン"
-          expandedContent={<RestaurantList restaurants={nearbyRestaurants} />}
-        >
-          <CarouselContainer slideToShow={4}>
-            {nearbyRestaurants.map((restaurant, index) => [
-              <RestaurantCard key={index} restaurant={restaurant} />,
-            ])}
-          </CarouselContainer>
-        </Section>
-      ) : (
-        <p>近くにレストランが見つかりませんでした。</p>
-      )}
-      {!nearbyRamenRestaurants ? (
-        <p>{nearbyRamenRestaurantsError}</p>
-      ) : nearbyRamenRestaurants.length > 0 ? (
-        <Section
-          title="近くのラーメン店"
-          expandedContent={
-            <RestaurantList restaurants={nearbyRamenRestaurants} />
-          }
-        >
-          <CarouselContainer slideToShow={4}>
-            {nearbyRamenRestaurants.map((restaurant, index) => [
-              <RestaurantCard key={index} restaurant={restaurant} />,
-            ])}
-          </CarouselContainer>
-        </Section>
-      ) : (
-        <p>近くにラーメン店が見つかりませんでした。</p>
-      )}
-    </>
+        {!nearbyRestaurants ? (
+          <p className="text-sm text-[#8C8474] font-sans">
+            {nearbyRestaurantsError}
+          </p>
+        ) : nearbyRestaurants.length > 0 ? (
+          <Section
+            title="近くのレストラン"
+            expandedContent={<RestaurantList restaurants={nearbyRestaurants} />}
+          >
+            <CarouselContainer slideToShow={4}>
+              {nearbyRestaurants.map((restaurant, index) => [
+                <RestaurantCard key={index} restaurant={restaurant} />,
+              ])}
+            </CarouselContainer>
+          </Section>
+        ) : (
+          <p className="text-sm text-[#8C8474] font-sans">
+            近くにレストランが見つかりませんでした
+          </p>
+        )}
+
+        {!nearbyRamenRestaurants ? (
+          <p className="text-sm text-[#8C8474] font-sans">
+            {nearbyRamenRestaurantsError}
+          </p>
+        ) : nearbyRamenRestaurants.length > 0 ? (
+          <Section
+            title="近くのラーメン店"
+            expandedContent={
+              <RestaurantList restaurants={nearbyRamenRestaurants} />
+            }
+          >
+            <CarouselContainer slideToShow={4}>
+              {nearbyRamenRestaurants.map((restaurant, index) => [
+                <RestaurantCard key={index} restaurant={restaurant} />,
+              ])}
+            </CarouselContainer>
+          </Section>
+        ) : (
+          <p className="text-sm text-[#8C8474] font-sans">
+            近くにラーメン店が見つかりませんでした
+          </p>
+        )}
+      </main>
+    </div>
   );
 }

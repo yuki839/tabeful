@@ -309,6 +309,17 @@ export async function getPlaceDetails(
         results.location = data.location
     }
 
+    if (fields.includes("displayName") && data.displayName?.text) {
+        results.displayName = data.displayName.text;
+    }
+    if (fields.includes("primaryType") && data.primaryType) {
+        results.primaryType = data.primaryType;
+    }
+    if (fields.includes("photos")
+    ) {
+        results.photoUrl = data.photos?.[0]?.name ? await getPhotUrl(data.photos[0].name) : "/no_image.png";
+    }
+
     return {data: results}
 
     

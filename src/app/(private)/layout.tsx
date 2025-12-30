@@ -8,7 +8,7 @@ export default function PrivatePageLayout({
   return (
     <>
       <Header />
-      <main className="max-w-screen-xl mx-auto px-10 pt-16">{children}</main>
+      {children}
     </>
   );
 }

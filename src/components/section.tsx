@@ -18,10 +18,16 @@ export default function Section({
     setIsExpanded((prev) => !prev);
   };
   return (
-    <section>
-      <div className="flex items-center justify-between py-3">
-        <h2 className="text-2xl font-bold">{title}</h2>
-        <Button onClick={handleChange}>
+    <section className="space-y-8">
+      <div className="flex items-end justify-between border-b border-[#E0E0E0] pb-4">
+        <h2 className="text-2xl font-serif text-[#2D2A26] tracking-wide">
+          {title}
+        </h2>
+        <Button
+          onClick={handleChange}
+          variant="outline"
+          className="border-[#2D2A26] text-[#2D2A26] bg-transparent text-[10px] font-bold tracking-[0.2em] uppercase hover:bg-[#2D2A26] hover:text-white transition-all duration-300 shadow-sm"
+        >
           {isExpanded ? "表示を戻す" : "すべて表示"}
         </Button>
       </div>
