@@ -44,6 +44,166 @@ export type Database = {
         }
         Relationships: []
       }
+      album_posts: {
+        Row: {
+          bookmark_id: string
+          caption: string | null
+          created_at: string
+          id: string
+          image_path: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          bookmark_id: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          bookmark_id?: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "album_posts_bookmark_id_fkey"
+            columns: ["bookmark_id"]
+            isOneToOne: false
+            referencedRelation: "bookmarks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      album_photos: {
+        Row: {
+          bookmark_id: string
+          caption: string | null
+          created_at: string
+          id: string
+          image_path: string
+          updated_at: string | null
+        }
+        Insert: {
+          bookmark_id: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path: string
+          updated_at?: string | null
+        }
+        Update: {
+          bookmark_id?: string
+          caption?: string | null
+          created_at?: string
+          id?: string
+          image_path?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "album_photos_bookmark_id_fkey"
+            columns: ["bookmark_id"]
+            isOneToOne: false
+            referencedRelation: "bookmarks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      bookmark_items: {
+        Row: {
+          bookmark_id: string
+          created_at: string
+          id: string
+          place_id: string
+          sort_order: number
+          visit_time: string | null
+        }
+        Insert: {
+          bookmark_id: string
+          created_at?: string
+          id?: string
+          place_id: string
+          sort_order: number
+          visit_time?: string | null
+        }
+        Update: {
+          bookmark_id?: string
+          created_at?: string
+          id?: string
+          place_id?: string
+          sort_order?: number
+          visit_time?: string | null
+        }
+        Relationships: []
+      }
+      bookmarks: {
+        Row: {
+          area: string | null
+          cover_image_path: string | null
+          created_at: string
+          id: string
+          title: string
+          travel_date: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          area?: string | null
+          cover_image_path?: string | null
+          created_at?: string
+          id?: string
+          title: string
+          travel_date?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          area?: string | null
+          cover_image_path?: string | null
+          created_at?: string
+          id?: string
+          title?: string
+          travel_date?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      places: {
+        Row: {
+          cached_address_text: string | null
+          cached_name: string | null
+          google_place_id: string
+          latitude: number
+          longitude: number
+          primary_type: string | null
+        }
+        Insert: {
+          cached_address_text?: string | null
+          cached_name?: string | null
+          google_place_id: string
+          latitude: number
+          longitude: number
+          primary_type?: string | null
+        }
+        Update: {
+          cached_address_text?: string | null
+          cached_name?: string | null
+          google_place_id?: string
+          latitude?: number
+          longitude?: number
+          primary_type?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string

@@ -1,6 +1,5 @@
-import { AddressSuggestion, GooglePlacesAutocompleteApiResponse, RestaurantSuggestion } from "@/types";
-import { error } from "console";
-import { NextRequest, NextResponse } from "next/server"
+import { AddressSuggestion, GooglePlacesAutocompleteApiResponse } from "@/types";
+import { NextRequest, NextResponse } from "next/server";
 
 export async function GET(request: NextRequest) {
       const searchParams = request.nextUrl.searchParams
@@ -8,11 +7,11 @@ export async function GET(request: NextRequest) {
   const sessionToken = searchParams.get('sessionToken');
 
   if(!input) {
-    NextResponse.json({ error: "文字を入力してください"},{ status: 400 });
+    return NextResponse.json({ error: "文字を入力してください"},{ status: 400 });
   }
 
   if(!sessionToken) {
-    NextResponse.json({ error: "セッショントークンは必須です"},{ status: 400 });
+    return NextResponse.json({ error: "セッショントークンは必須です"},{ status: 400 });
   }
 
   try{
@@ -56,7 +55,7 @@ export async function GET(request: NextRequest) {
         const errorData = await response.json();
         console.error(errorData);
         return NextResponse.json(
-            {error: `Autocompleteリクエスト失敗：${response.status}` },
+            {error: `Autocompleteリクエスト失敗：$${response.status}` },
             {status : 500}
         );
     }

@@ -2,7 +2,9 @@ export interface Restaurant {
     id: string;
     restaurantName?: string;
     primaryType?: string;
+    rating?: number;
     photoUrl: string;
+    location?: { lat: number; lng: number };
 };
 
 export interface GooglePlacesSearchApiResponse{
@@ -16,7 +18,10 @@ export interface PlaceSearchResult{
         text?: string
     }
     primaryType?: string,
+    rating?: number,
+    userRatingCount?: number,
     photos?: PlacePhoto[],
+    location?: { latitude?: number; longitude?: number },
 };
 
 export interface PlacePhoto{
@@ -55,6 +60,7 @@ export interface GooglePlacesDetailsApiResponse {
     };
     primaryType?:string;
     photos?:PlacePhoto[];
+    formattedAddress?: string;
 }
 
 export interface placeDetailsAll {
@@ -62,6 +68,7 @@ export interface placeDetailsAll {
         displayName?: string;
         primaryType?: string;
         photoUrl?:string;
+        formattedAddress?: string;
     }
 
 export interface RestaurantSuggestion {
@@ -86,5 +93,5 @@ export interface Address {
 
 export interface AddressResponse {
     addressList: Address[],
-    selectedAddress: Address;
+    selectedAddress: Address | null;
 }

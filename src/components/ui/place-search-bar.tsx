@@ -11,27 +11,67 @@ import { useDebouncedCallback } from "use-debounce";
 import { v4 as uuidv4 } from "uuid";
 import { RestaurantSuggestion } from "@/types";
 import { AlertCircle, LoaderCircle, MapPin, Search } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import { cn } from "@/lib/utils";
 
 interface PlaceSearchBarProps {
   lat: number;
   lng: number;
+  className?: string;
+  inputClassName?: string;
+  listClassName?: string;
+  initialQuery?: string;
 }
 
-export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
+export default function PlaceSearchBar({
+  lat,
+  lng,
+  className,
+  inputClassName,
+  listClassName,
+  initialQuery,
+}: PlaceSearchBarProps) {
+  const NO_SELECTION = "__none__";
   const [open, setOpen] = useState(false);
   const [inputText, setInputText] = useState("");
-  const [sessionToken, setSessionToken] = useState(uuidv4());
-  const [selectedValue, setSelectedValue] = useState("");
-  const [pointerActive, setPointerActive] = useState(false);
+  const [sessionToken, setSessionToken] = useState("");
   const [suggestions, setSuggestions] = useState<RestaurantSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const clickedOnItem = useRef(false);
-  const lastInteractionRef = useRef<"none" | "keyboard" | "pointer">("none");
+  const suppressAutoOpenRef = useRef(false);
+  const didInitFromQueryRef = useRef(false);
 
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const initializedRef = useRef(false);
+  const inputTextRef = useRef(inputText);
+  const restaurantParam = searchParams.get("restaurant") ?? "";
+
+  useEffect(() => {
+    inputTextRef.current = inputText;
+  }, [inputText]);
+
+  useEffect(() => {
+    const restaurant = initialQuery ?? restaurantParam;
+    if (restaurant && restaurant !== inputTextRef.current) {
+      suppressAutoOpenRef.current = true;
+      didInitFromQueryRef.current = true;
+      setInputText(restaurant);
+    }
+    if (!initializedRef.current) {
+      initializedRef.current = true;
+    }
+  }, [initialQuery, restaurantParam]);
+
+  const ensureSessionToken = () => {
+    if (sessionToken) return sessionToken;
+    const next = uuidv4();
+    setSessionToken(next);
+    return next;
+  };
 
   const fetchSuggestions = useDebouncedCallback(async (input: string) => {
     if (!input.trim()) {
@@ -43,8 +83,9 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
 
     try {
       // APIを呼び出して候補を取得する処理をここに実装
+      const token = ensureSessionToken();
       const response = await fetch(
-        `/api/restaurant/autocomplete?input=${input}&sessionToken=${sessionToken}&lat=${lat}&lng=${lng}`
+        `/api/restaurant/autocomplete?input=${input}&sessionToken=${token}&lat=${lat}&lng=${lng}`
       );
 
       if (!response.ok) {
@@ -66,20 +107,31 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
 
   useEffect(() => {
     if (!inputText.trim()) {
+      if (didInitFromQueryRef.current && searchParams.get("restaurant")) {
+        didInitFromQueryRef.current = false;
+        return;
+      }
       setOpen(false);
       setSuggestions([]);
-      setSelectedValue("");
-      setPointerActive(false);
-      lastInteractionRef.current = "none";
+      setIsLoading(false);
+      if (searchParams.get("restaurant")) {
+        const params = new URLSearchParams(searchParams.toString());
+        params.delete("restaurant");
+        const query = params.toString();
+        router.replace(query ? `/search?${query}` : "/search");
+      }
+      return;
+    }
+    if (suppressAutoOpenRef.current) {
+      suppressAutoOpenRef.current = false;
+      setOpen(false);
+      setSuggestions([]);
       return;
     }
     setIsLoading(true);
     setOpen(true);
-    setSelectedValue("");
-    setPointerActive(false);
-    lastInteractionRef.current = "none";
     fetchSuggestions(inputText);
-  }, [inputText]);
+  }, [fetchSuggestions, inputText, router, searchParams]);
 
   const handleBlur = () => {
     if (clickedOnItem.current) {
@@ -99,61 +151,68 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
     console.log("suggestion", suggestion);
 
     if (suggestion.type === "placePrediction") {
-      router.push(
-        `/restaurant/${suggestion.placeId}?sessionToken=${sessionToken}`
-      );
+      const token = ensureSessionToken();
+      router.push(`/restaurant/${suggestion.placeId}?sessionToken=${token}`);
       setSessionToken(uuidv4());
     } else {
-      //検索結果ページ
-      router.push(`/search?restaurant=${suggestion.placeName}`);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("restaurant", suggestion.placeName);
+      const query = params.toString();
+      router.push(query ? `/search?${query}` : "/search");
     }
     setOpen(false);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (!inputText.trim()) return;
-    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
-      lastInteractionRef.current = "keyboard";
-    }
     if (e.key === "Enter") {
-      router.push(`/search?restaurant=${inputText}`);
+      e.preventDefault();
+      e.stopPropagation();
+      const params = new URLSearchParams(searchParams.toString());
+      if (inputText.trim()) {
+        params.set("restaurant", inputText);
+      } else {
+        params.delete("restaurant");
+      }
+      const query = params.toString();
+      router.push(query ? `/search?${query}` : "/search");
       setOpen(false);
-    }
-  };
-
-  const handleValueChange = (value: string) => {
-    if (pointerActive || lastInteractionRef.current === "keyboard") {
-      setSelectedValue(value);
     }
   };
 
   return (
     <Command
-      value={selectedValue}
-      onValueChange={handleValueChange}
+      id="quick-search"
+      value={NO_SELECTION}
+      onValueChange={() => {}}
       onKeyDown={handleKeyDown}
-      className="overflow-visible bg-white border border-[#E0E0E0] rounded-full px-4 py-1.5 focus-within:border-[#2D2A26] focus-within:ring-1 focus-within:ring-[#2D2A26] shadow-sm"
+      className={cn(
+        "overflow-visible rounded-none border border-[var(--noir-border)] bg-white/95 px-4 py-2 shadow-[0_18px_45px_rgba(15,15,15,0.12)] focus-within:border-black focus-within:ring-1 focus-within:ring-black",
+        className
+      )}
       shouldFilter={false}
     >
       <CommandInput
         value={inputText}
-        placeholder="Search memories..."
+        placeholder="お店を検索..."
         onValueChange={setInputText}
         onBlur={handleBlur}
         onFocus={handleFocus}
-        className="text-sm font-sans placeholder-[#B0AAA0]"
+        className={cn(
+          "text-sm font-ui placeholder:text-[var(--noir-muted)]",
+          inputClassName
+        )}
       />
       {open && (
-        <div
-          className="relative"
-          onMouseMove={() => {
-            setPointerActive(true);
-            lastInteractionRef.current = "pointer";
-          }}
-        >
-          <CommandList className="absolute mt-2 bg-white w-full border border-[#E5E5E5] shadow-[0_15px_40px_-10px_rgba(0,0,0,0.18)] rounded-[4px]">
+        <div className="relative">
+          <CommandList
+            className={cn(
+              "absolute z-50 mt-2 w-full border border-[var(--noir-border)] bg-white shadow-[0_18px_40px_rgba(15,15,15,0.16)]",
+              listClassName
+            )}
+          >
             <CommandEmpty>
-              <div className="flex items-center justify-center text-sm text-[#8C8474] font-sans">
+              <div className="flex items-center justify-center text-sm font-ui text-[var(--noir-muted)]">
                 {isLoading ? (
                   <LoaderCircle className="animate-spin" />
                 ) : errorMessage ? (
@@ -168,7 +227,7 @@ export default function PlaceSearchBar({ lat, lng }: PlaceSearchBarProps) {
             </CommandEmpty>
             {suggestions.map((suggestion, index) => (
               <CommandItem
-                className="px-4 py-3 text-sm text-[#2D2A26] font-sans data-[selected=true]:bg-[#F5F5F5]"
+                className="rounded-none px-4 py-3 text-sm font-ui text-[var(--noir-ink)] data-[selected=true]:bg-transparent data-[selected=true]:text-[var(--noir-ink)]"
                 value={suggestion.placeName}
                 key={suggestion.placeId ?? index}
                 onSelect={() => handleSelectSuggestion(suggestion)}

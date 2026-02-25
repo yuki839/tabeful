@@ -11,31 +11,29 @@ interface CategoryProps {
 
 export default function Category({ category, onClick, select }: CategoryProps) {
   return (
-    <div
+    <button
+      type="button"
       onClick={() => onClick(category.type)}
-      className="cursor-pointer group"
+      aria-pressed={select}
+      className={cn(
+        "group flex min-w-[140px] items-center gap-2.5 rounded-2xl border px-3 py-2.5 text-left transition duration-200 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-black focus-visible:ring-0 active:translate-y-0.5 sm:min-w-[170px] sm:px-4 sm:py-3",
+        select
+          ? "border-black bg-black text-white shadow-[0_16px_35px_rgba(0,0,0,0.25)]"
+          : "border-[var(--noir-border)] bg-white text-[var(--noir-ink)] hover:border-black hover:shadow-[0_12px_30px_rgba(0,0,0,0.08)]"
+      )}
     >
-      <div
-        className={cn(
-          "flex items-center gap-3 px-5 py-3 rounded-full border transition-all duration-300",
-          select
-            ? "bg-[#2D2A26] text-white border-[#2D2A26] shadow-md"
-            : "bg-white text-[#5C5448] border-[#E0E0E0] hover:border-[#2D2A26] hover:shadow-sm"
-        )}
-      >
-        <div className="relative w-8 h-8 rounded-full bg-[#F5F5F5] overflow-hidden">
-          <Image
-            className="object-cover scale-75 transition-transform duration-300 group-hover:scale-90"
-            src={category.imageUrl}
-            fill
-            alt={category.categoryName}
-            sizes="(max-width: 1280px) 10vw, 97px"
-          />
-        </div>
-        <p className="text-[11px] font-bold tracking-widest uppercase truncate">
-          {category.categoryName}
-        </p>
+      <div className="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-[var(--noir-border)] bg-[var(--noir-surface)] transition duration-200 group-hover:scale-[1.05] sm:h-11 sm:w-11">
+        <Image
+          className="object-cover scale-75 transition-transform duration-300"
+          src={category.imageUrl}
+          fill
+          alt={category.categoryName}
+          sizes="(max-width: 1280px) 10vw, 97px"
+        />
       </div>
-    </div>
+      <p className="text-[10px] font-ui uppercase tracking-[0.28em] text-current leading-tight whitespace-normal sm:text-[11px] sm:tracking-[0.3em]">
+        {category.categoryName}
+      </p>
+    </button>
   );
 }

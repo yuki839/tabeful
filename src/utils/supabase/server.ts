@@ -17,9 +17,8 @@ export async function createClient() {
           try {
             cookiesToSet.forEach(({ name, value }) => cookieStore.set(name, value))
           } catch {
-            // The `setAll` method was called from a Server Component.
-            // This can be ignored if you have middleware refreshing
-            // user sessions.
+            // サーバーコンポーネントから setAll が呼ばれた場合の例外。
+            // ミドルウェアでセッション更新していれば無視してよい。
           }
         },
       },

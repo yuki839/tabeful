@@ -1,5 +1,4 @@
 import { GooglePlacesAutocompleteApiResponse, RestaurantSuggestion } from "@/types";
-import { error } from "console";
 import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest) {
@@ -8,17 +7,23 @@ export async function GET(request: NextRequest) {
   const sessionToken = searchParams.get('sessionToken');
   const lat = searchParams.get('lat');
   const lng = searchParams.get('lng');
+  const latitude = lat ? Number(lat) : Number.NaN;
+  const longitude = lng ? Number(lng) : Number.NaN;
   console.log("input",input);
   console.log("sessionToken",sessionToken);
 
   if(!input) {
-    NextResponse.json({ error: "文字を入力してください"},{ status: 400 });
+    return NextResponse.json({ error: "文字を入力してください"},{ status: 400 });
   }
 
   if(!sessionToken) {
-    NextResponse.json({ error: "セッショントークンは必須です"},{ status: 400 });
+    return NextResponse.json({ error: "セッショントークンは必須です"},{ status: 400 });
   }
 
+
+  if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+    return NextResponse.json({ error: "Invalid lat/lng" }, { status: 400 });
+  }
   try{
 
     const url = "https://places.googleapis.com/v1/places:autocomplete"
@@ -34,14 +39,20 @@ export async function GET(request: NextRequest) {
         includeQueryPredictions: true,
         input: input,
         sessionToken: sessionToken,
-        includedPrimaryTypes: ["restaurant"],
-        locationBias: {
+        includedPrimaryTypes: [
+            "restaurant",
+            "cafe",
+            "coffee_shop",
+            "bakery",
+            "bar"
+        ],
+        locationRestriction: {
             circle: {
             center: {
-                latitude: lat,
-                longitude: lng,
+                latitude: latitude,
+                longitude: longitude,
             },
-            radius: 1000.0
+            radius: 2000.0
         }
     },
     languageCode: "ja",
@@ -60,7 +71,7 @@ export async function GET(request: NextRequest) {
         const errorData = await response.json();
         console.error(errorData);
         return NextResponse.json(
-            {error: `Autocompleteリクエスト失敗：${response.status}` },
+            {error: `Autocompleteリクエスト失敗：$${response.status}` },
             {status : 500}
         );
     }

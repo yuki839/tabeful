@@ -1,14 +1,30 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import {
+  Geist_Mono,
+  Manrope,
+  Playfair_Display,
+  Shippori_Mincho,
+} from "next/font/google";
 import "./globals.css";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const manrope = Manrope({
+  variable: "--font-manrope",
   subsets: ["latin"],
 });
 
 const geistMono = Geist_Mono({
   variable: "--font-geist-mono",
+  subsets: ["latin"],
+});
+
+const shipporiMincho = Shippori_Mincho({
+  variable: "--font-shippori-mincho",
+  weight: ["400", "600", "700"],
+  subsets: ["latin", "latin-ext"],
+});
+
+const playfairDisplay = Playfair_Display({
+  variable: "--font-playfair-display",
   subsets: ["latin"],
 });
 
@@ -25,7 +41,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${manrope.variable} ${shipporiMincho.variable} ${geistMono.variable} ${playfairDisplay.variable} antialiased`}
       >
         {children}
       </body>

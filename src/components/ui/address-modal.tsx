@@ -30,16 +30,25 @@ import { cn } from "@/lib/utils";
 import { Button } from "./button";
 import { useRouter } from "next/navigation";
 
-export default function AddressModal() {
+interface AddressModalProps {
+  triggerClassName?: string;
+}
+
+export default function AddressModal({ triggerClassName }: AddressModalProps) {
   const [inputText, setInputText] = useState("");
-  const [sessionToken, setSessionToken] = useState(uuidv4());
-  const [selectedValue, setSelectedValue] = useState("");
-  const [pointerActive, setPointerActive] = useState(false);
+  const [sessionToken, setSessionToken] = useState("");
   const [suggestions, setSuggestions] = useState<AddressSuggestion[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [open, setOpen] = useState(false);
   const router = useRouter();
+
+  const ensureSessionToken = () => {
+    if (sessionToken) return sessionToken;
+    const next = uuidv4();
+    setSessionToken(next);
+    return next;
+  };
 
   const fetchSuggestions = useDebouncedCallback(async (input: string) => {
     if (!input.trim()) {
@@ -51,8 +60,9 @@ export default function AddressModal() {
 
     try {
       // APIを呼び出して候補を取得する処理をここに実装
+      const token = ensureSessionToken();
       const response = await fetch(
-        `/api/address/autocomplete?input=${input}&sessionToken=${sessionToken}`
+        `/api/address/autocomplete?input=${input}&sessionToken=${token}`
       );
 
       if (!response.ok) {
@@ -75,20 +85,19 @@ export default function AddressModal() {
   useEffect(() => {
     if (!inputText.trim()) {
       setSuggestions([]);
-      setSelectedValue("");
-      setPointerActive(false);
       return;
     }
     setIsLoading(true);
-    setSelectedValue("");
-    setPointerActive(false);
     fetchSuggestions(inputText);
-  }, [inputText]);
+  }, [inputText, fetchSuggestions]);
 
   const fetcher = async (url: string) => {
     const response = await fetch(url);
 
     if (!response.ok) {
+      if (response.status === 401) {
+        return { addressList: [], selectedAddress: null };
+      }
       const errorData = await response.json();
       throw new Error(errorData.error);
     }
@@ -115,7 +124,8 @@ export default function AddressModal() {
     console.log(suggestion);
 
     try {
-      await selectSuggestionAction(suggestion, sessionToken);
+      const token = ensureSessionToken();
+      await selectSuggestionAction(suggestion, token);
       setSessionToken(uuidv4());
 
       setInputText("");
@@ -131,8 +141,13 @@ export default function AddressModal() {
   const handleSelectAddress = async (address: Address) => {
     //console.log("address", address);
     try {
+      mutate(
+        (current) =>
+          current ? { ...current, selectedAddress: address } : current,
+        { revalidate: false }
+      );
       await selectAddressAction(address.id);
-      mutate();
+      await mutate();
       setOpen(false);
       router.refresh();
     } catch (error) {
@@ -161,10 +176,15 @@ export default function AddressModal() {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
+      <DialogTrigger
+        className={cn(
+          "inline-flex items-center text-sm font-ui text-[var(--noir-muted)] transition hover:text-black",
+          triggerClassName
+        )}
+      >
         {data?.selectedAddress ? data.selectedAddress.name : "住所を選択"}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="rounded-none border border-[var(--noir-border)] bg-white font-ui text-[var(--noir-ink)] shadow-[var(--noir-shadow)]">
         <DialogHeader>
           <DialogTitle>住所</DialogTitle>
           <DialogDescription className="sr-only">

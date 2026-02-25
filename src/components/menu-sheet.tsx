@@ -7,7 +7,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Bookmark, Heart, Menu } from "lucide-react";
+import { Bookmark, BookOpen, Heart, Image, Menu, UploadCloud } from "lucide-react";
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -30,11 +30,18 @@ async function MenuSheet() {
   return (
     <Sheet>
       <SheetTrigger asChild>
-        <Button variant={"ghost"} size={"icon"}>
+        <Button
+          variant={"ghost"}
+          size={"icon"}
+          className="rounded-none border border-[var(--noir-border)] bg-white text-black hover:bg-black hover:text-white"
+        >
           <Menu />
         </Button>
       </SheetTrigger>
-      <SheetContent side="left" className="w-72 p-6">
+      <SheetContent
+        side="left"
+        className="w-72 border-r border-[var(--noir-border)] bg-white p-6 font-ui text-[var(--noir-ink)] rounded-none"
+      >
         <SheetHeader className="sr-only">
           <SheetTitle>メニュー情報</SheetTitle>
           <SheetDescription>ユーザー情報とメニュー情報を表示</SheetDescription>
@@ -58,6 +65,24 @@ async function MenuSheet() {
 
         {/* メニューエリア */}
         <ul className="space-y-4">
+          <li>
+            <Link href={"/bookmarks/import"} className="flex items-center gap-4">
+              <UploadCloud />
+              <span className="font-bold">取り込み</span>
+            </Link>
+          </li>
+          <li>
+            <Link href={"/bookmarks"} className="flex items-center gap-4">
+              <BookOpen />
+              <span className="font-bold">しおり</span>
+            </Link>
+          </li>
+          <li>
+            <Link href={"/album"} className="flex items-center gap-4">
+              <Image />
+              <span className="font-bold">アルバム</span>
+            </Link>
+          </li>
           <li>
             <Link href={"orders"} className="flex items-center gap-4">
               <Bookmark fill="bg-primary" />

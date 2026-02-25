@@ -1,5 +1,4 @@
 import { Restaurant } from "@/types";
-import { Camera, Heart } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
@@ -9,40 +8,43 @@ interface RestaurantCardProps {
 }
 
 export default function RestaurantCard({ restaurant }: RestaurantCardProps) {
+  const label = restaurant.primaryType?.replaceAll("_", " ");
+  const tag = restaurant.primaryType
+    ? `#${restaurant.primaryType.replaceAll("_", "")}`
+    : null;
+
   return (
-    <div className="group relative">
+    <div className="group relative flex h-full flex-col">
       <Link
         href={`/restaurant/${restaurant.id}`}
         className="absolute inset-0 z-10"
       />
-      <div className="bg-white p-3 pb-4 rounded-[4px] shadow-[0_2px_10px_rgba(0,0,0,0.03)] border border-[#EBEBEB] transition-all duration-300 ease-out group-hover:shadow-[0_20px_40px_-10px_rgba(0,0,0,0.12)] group-hover:-translate-y-2 group-hover:rotate-[0.5deg]">
-        <div className="aspect-[4/5] w-full overflow-hidden bg-[#F5F5F5] relative mb-3 rounded-[2px]">
+      <div className="relative aspect-[4/3] overflow-hidden border border-[var(--noir-border)] bg-[var(--noir-surface)] shadow-[0_18px_40px_rgba(15,15,15,0.12)] transition-all duration-300 group-hover:-translate-y-1 group-hover:shadow-[0_28px_60px_rgba(15,15,15,0.2)]">
+        {restaurant.photoUrl ? (
           <Image
-            className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+            className="object-cover transition-transform duration-700 group-hover:scale-110"
             src={restaurant.photoUrl}
             fill
-            alt="レストラン画像"
-            sizes="(max-width: 1280px) 25vw, 280px"
+            alt="レストラン写真"
+            sizes="(max-width: 1280px) 45vw, 320px"
           />
-          <div className="absolute inset-0 bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-4">
-            <button className="w-10 h-10 rounded-full bg-white/90 text-[#2D2A26] flex items-center justify-center hover:bg-[#2D2A26] hover:text-white transition-all shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300 delay-75">
-              <Heart size={18} />
-            </button>
-            <button className="w-10 h-10 rounded-full bg-white/90 text-[#2D2A26] flex items-center justify-center hover:bg-[#2D2A26] hover:text-white transition-all shadow-lg transform translate-y-4 group-hover:translate-y-0 duration-300 delay-100">
-              <Camera size={18} />
-            </button>
-          </div>
-        </div>
-        <div className="px-1 text-center">
-          <h3 className="text-sm font-bold text-[#1A1A1A] truncate tracking-wide font-sans mb-1 group-hover:text-[#8C7B6C] transition-colors">
-            {restaurant.restaurantName}
-          </h3>
-          {restaurant.primaryType && (
-            <span className="inline-block text-[10px] text-[#8C8474] font-sans uppercase tracking-wider px-2 py-0.5 bg-[#F5F5F5] rounded-sm">
-              {restaurant.primaryType.replaceAll("_", " ")}
-            </span>
-          )}
-        </div>
+        ) : null}
+        <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/30 to-transparent opacity-70 transition-opacity duration-300 group-hover:opacity-90" />
+        {label ? (
+          <span className="absolute bottom-3 left-3 border border-white/30 bg-black/50 px-2 py-1 text-[10px] font-ui uppercase tracking-[0.3em] text-white">
+            {label}
+          </span>
+        ) : null}
+      </div>
+      <div className="mt-3 space-y-2 px-1">
+        <h3 className="truncate font-display text-base tracking-[0.08em] text-[var(--noir-ink)]">
+          {restaurant.restaurantName ?? "名称未設定"}
+        </h3>
+        {tag ? (
+          <span className="inline-block border border-[var(--noir-border)] bg-white px-2 py-1 text-[10px] font-ui uppercase tracking-[0.3em] text-[var(--noir-muted)]">
+            {tag}
+          </span>
+        ) : null}
       </div>
     </div>
   );

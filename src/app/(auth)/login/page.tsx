@@ -8,9 +8,17 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import Image from "next/image";
-
-export default function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ next?: string }> | { next?: string };
+}) {
+  const resolvedSearchParams = await searchParams;
+  const nextPath =
+    typeof resolvedSearchParams?.next === "string" &&
+    resolvedSearchParams.next.trim().length > 0
+      ? resolvedSearchParams.next
+      : "/";
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-sky-50 to-blue-100">
       <Card className="w-full max-w-sm">
@@ -31,12 +39,12 @@ export default function LoginPage() {
 
         <CardContent className="space-y-4">
           <form>
+            <input type="hidden" name="next" value={nextPath} />
             <Button
               formAction={login}
               className="w-full flex items-center gap-3"
               size="lg"
             >
-              {/* Google風アイコン（簡易） */}
               <svg width="18" height="18" viewBox="0 0 48 48">
                 <path
                   fill="#EA4335"

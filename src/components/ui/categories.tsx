@@ -25,7 +25,6 @@ export default function Categories() {
     {
       categoryName: "ラーメン",
       type: "ramen_restaurant",
-
       imageUrl: "/images/categories/ラーメン.png",
     },
     {
@@ -36,7 +35,6 @@ export default function Categories() {
     {
       categoryName: "中華料理",
       type: "chinese_restaurant",
-
       imageUrl: "/images/categories/中華料理.png",
     },
     {
@@ -50,17 +48,15 @@ export default function Categories() {
       imageUrl: "/images/categories/イタリアン.png",
     },
     {
-      categoryName: "フランス料理",
+      categoryName: "フレンチ",
       type: "french_restaurant",
       imageUrl: "/images/categories/フレンチ.png",
     },
-
     {
       categoryName: "ピザ",
       type: "pizza_restaurant",
       imageUrl: "/images/categories/ピザ.png",
     },
-
     {
       categoryName: "韓国料理",
       type: "korean_restaurant",
@@ -81,15 +77,17 @@ export default function Categories() {
     const params = new URLSearchParams(searchParams);
 
     if (currentCategory === category) {
-      router.replace("/");
+      params.delete("category");
     } else {
       params.set("category", category);
-      router.replace(`/search?${params.toString()}`);
     }
+
+    const query = params.toString();
+    router.replace(query ? `/search?${query}` : "/search");
   };
 
   return (
-    <CarouselContainer slideToShow={10}>
+    <CarouselContainer slideToShow={8}>
       {categories.map((category, index) => (
         <Category
           key={index}

@@ -1,8 +1,8 @@
 import { Address } from "@/types";
 import { createClient } from "@/utils/supabase/server";
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 
-export async function GET(request: NextRequest) {
+export async function GET() {
     try{
         
         let addressList:Address[] = [];
@@ -28,17 +28,20 @@ export async function GET(request: NextRequest) {
         addressList = addressData   
 
         //選択中の住所情報をテーブルから取得
-
         const {data:selectedAddressData, error:selectedAddressDataError} = await supabase
         .from("profiles")
-        .select("addresses(id,name,address_text,latitude,longitude)").eq("id", user.id).single();
+        .select("selected_address_id")
+        .eq("id", user.id)
+        .maybeSingle();
 
         if (selectedAddressDataError) {
-            console.log("プロフィール情報の取得に失敗しました。",selectedAddressDataError)
-            return NextResponse.json({error:"プロフィール情報の取得に失敗しました。"},{status:500});           
+            selectedAddress = null;
+        } else {
+            const selectedId = selectedAddressData?.selected_address_id ?? null;
+            selectedAddress = selectedId
+                ? addressList.find((address) => address.id === selectedId) ?? null
+                : null;
         }
-
-        selectedAddress = selectedAddressData.addresses;
 
         console.log("addressList",addressList)
         console.log("selectedAddress",selectedAddress)
